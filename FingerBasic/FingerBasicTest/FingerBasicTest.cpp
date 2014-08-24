@@ -3,6 +3,8 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <windows.h>
+#include <string>
 #include <vector>
 #include <algorithm>
 #define _USE_MATH_DEFINES
@@ -15,7 +17,6 @@
 #include "MinuDescMCC.h"
 #include "MinuMatchTico.h"
 
-int g_debug = 1;
 char g_fpPath[2][_MAX_PATH];
 char g_featurePath[2][_MAX_PATH];
 
@@ -25,29 +26,47 @@ void DoSingle(char* title1, char* title2);
 void WindowCallback(int k, int event, int x, int y, int flags);
 void WindowCallback0(int event, int x, int y, int flags);
 void WindowCallback1(int event, int x, int y, int flags);
-void FeatureExtract(char* path, char* title);
-//void Match(char* path, char* title1, char* title2);
+void FeatureExtract(char* title);
 
 int main(int argc, char* argv[])
 {
 	SetPath();
-	FeatureExtract("d:\\data\\fvc2002\\db1_a\\", "1_1");
+	FeatureExtract("1_1");
 	DoSingle("1_1", "1_3");
 
 	return 0;
 }
 
-
-void FeatureExtract(char* path, char* title)
+void SetPath()
 {
+	// Get the path of current project
+    char buffer[_MAX_PATH];
+    ::GetModuleFileNameA(NULL, buffer, _MAX_PATH);
+    string::size_type pos = string( buffer ).find_last_of( "\\/" );
+    string root = string(buffer).substr(0, pos);
+	pos = root.find_last_of( "\\/" );
+	root = root.substr(0, pos);
+	pos = root.find_last_of( "\\/" );
+	root = root.substr(0, pos);
+	root += "\\data";
+
+	sprintf(g_fpPath[0], "%s\\image\\", root.c_str());
+	strcpy(g_fpPath[1], g_fpPath[0]);
+	sprintf(g_featurePath[0], "%s\\feature\\", root.c_str());
+	strcpy(g_featurePath[1], g_featurePath[0]);
+}
+
+void FeatureExtract(char* title)
+{
+	// Load image
 	char fname[1000];
-	sprintf(fname, "%simage\\%s.bmp", path, title);
+	sprintf(fname, "%s%s.bmp", g_fpPath[0], title);
 	IplImage* fpImg = cvLoadImage(fname, -1);
 	IplImage* img = cvCreateImage(cvGetSize(fpImg), 8, 3);
 
 	// Load and show orientation field by VeriFinger
 	int block_size = 16;
-	sprintf(fname, "%sfeature\\Neu6.2\\pd%s.bmp", path, title);
+	sprintf(fname, "%spd%s.bmp", g_featurePath[0], title);
 	IplImage* pointOF = cvLoadImage(fname, -1);
 	IplImage* blockOF = cvCreateImage(cvSize(pointOF->width/block_size, pointOF->height/block_size), 8, 1);
 	cvResize(pointOF, blockOF, CV_INTER_NN);
@@ -59,7 +78,7 @@ void FeatureExtract(char* path, char* title)
 
 	// Load and show minutiae by VeriFinger
 	Minutiae minus;
-	sprintf(fname, "%sfeature\\Neu6.2\\m%s.txt", path, title);
+	sprintf(fname, "%sm%s.txt", g_featurePath[0], title);
 	LoadMinuTxt(fname, minus);
 	DrawImage(img, fpImg);
 	DrawMinutiae(img, minus);
@@ -93,13 +112,6 @@ void FeatureExtract(char* path, char* title)
 	cvReleaseImage(&binaryImage);
 }
 
-void SetPath()
-{
-	strcpy(g_fpPath[0], "d:/data/fvc2002/db1_a/image/");
-	strcpy(g_fpPath[1], g_fpPath[0]);
-	strcpy(g_featurePath[0], "d:/data/fvc2002/db1_a/feature/Neu6.2/");
-	strcpy(g_featurePath[1], g_featurePath[0]);
-}
 
 ////////////////////////////////////////////////////////
 // MCC + Tico + Simple scoring
@@ -115,8 +127,6 @@ void DoSingle(char* title0, char* title1)
 
 	////////////////////////////////////////////////////////
 	// Load features
-	g_debug = 1;
-	
 	for(int k = 0; k < 2; k++)
 	{
 		sprintf(fname, "%s%s.bmp", g_fpPath[k], titles[k]);

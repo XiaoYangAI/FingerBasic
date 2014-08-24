@@ -2,10 +2,17 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FingerBasicTest", "FingerBasicTest\FingerBasicTest.vcxproj", "{AA46F6B9-2F67-4882-A36A-3C0624ABCEA9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{871A20A6-823C-42F0-98E1-B7D226818C1B} = {871A20A6-823C-42F0-98E1-B7D226818C1B}
+		{8D9A29B8-657C-4361-9200-173729EE5FDE} = {8D9A29B8-657C-4361-9200-173729EE5FDE}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FingerBasicEncoder", "FingerBasicEncoder\FingerBasicEncoder.vcxproj", "{871A20A6-823C-42F0-98E1-B7D226818C1B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FingerBasicMatcher", "FingerBasicMatcher\FingerBasicMatcher.vcxproj", "{8D9A29B8-657C-4361-9200-173729EE5FDE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{871A20A6-823C-42F0-98E1-B7D226818C1B} = {871A20A6-823C-42F0-98E1-B7D226818C1B}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
